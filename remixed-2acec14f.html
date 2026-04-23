@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meta Ads Weekly Review — Apr 16–22, 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d2e;
+    --surface2: #222538;
+    --border: #2e3250;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --green: #22c55e;
+    --green-bg: #14532d30;
+    --yellow: #f59e0b;
+    --yellow-bg: #78350f30;
+    --red: #ef4444;
+    --red-bg: #7f1d1d30;
+    --blue: #3b82f6;
+    --accent: #6366f1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; }
+  
+  /* Header */
+  .header { background: linear-gradient(135deg, #1e3a8a, #312e81); padding: 24px 32px; border-bottom: 1px solid var(--border); }
+  .header h1 { font-size: 22px; font-weight: 700; color: #fff; }
+  .header .subtitle { color: #93c5fd; font-size: 13px; margin-top: 4px; }
+  
+  /* Tabs */
+  .tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; }
+  .tab { padding: 14px 20px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--muted); border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .tab:hover { color: var(--text); }
+  
+  /* Layout */
+  .content { padding: 24px 32px; display: none; }
+  .content.active { display: block; }
+  
+  /* KPI Cards */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+  .kpi-card .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .kpi-card .value { font-size: 28px; font-weight: 700; margin: 6px 0 2px; }
+  .kpi-card .sub { font-size: 12px; color: var(--muted); }
+  .kpi-card.green { border-top: 3px solid var(--green); }
+  .kpi-card.yellow { border-top: 3px solid var(--yellow); }
+  .kpi-card.red { border-top: 3px solid var(--red); }
+  .kpi-card.blue { border-top: 3px solid var(--blue); }
+  .green-text { color: var(--green); }
+  .yellow-text { color: var(--yellow); }
+  .red-text { color: var(--red); }
+  .blue-text { color: var(--blue); }
+  
+  /* Sections */
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+  .section h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  
+  /* Two-column grid */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { background: var(--surface2); color: var(--muted); font-weight: 600; padding: 10px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+  
+  /* Badges */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+  .badge-green { background: var(--green-bg); color: var(--green); border: 1px solid #22c55e40; }
+  .badge-yellow { background: var(--yellow-bg); color: var(--yellow); border: 1px solid #f59e0b40; }
+  .badge-red { background: var(--red-bg); color: var(--red); border: 1px solid #ef444440; }
+  .badge-blue { background: #1d4ed830; color: #60a5fa; border: 1px solid #3b82f640; }
+  .badge-grey { background: #1e293b; color: var(--muted); border: 1px solid var(--border); }
+  
+  /* Spend bar */
+  .spend-bar-wrap { background: var(--border); border-radius: 3px; height: 6px; }
+  .spend-bar { background: var(--accent); height: 6px; border-radius: 3px; }
+  
+  /* Alert banners */
+  .alert { border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; font-size: 13px; line-height: 1.5; display: flex; gap: 10px; align-items: flex-start; }
+  .alert-red { background: var(--red-bg); border: 1px solid #ef444440; }
+  .alert-yellow { background: var(--yellow-bg); border: 1px solid #f59e0b40; }
+  .alert-blue { background: #1d4ed830; border: 1px solid #3b82f640; }
+  .alert-green { background: var(--green-bg); border: 1px solid #22c55e40; }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  
+  /* Filters */
+  .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .filter-btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; font-size: 12px; transition: all 0.15s; }
+  .filter-btn.active, .filter-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+  
+  /* Search */
+  .search-input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 7px 12px; border-radius: 6px; font-size: 13px; width: 240px; outline: none; }
+  .search-input:focus { border-color: var(--blue); }
+  
+  /* Pagination */
+  .pagination { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 12px; }
+  .page-btn { padding: 5px 10px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; font-size: 12px; }
+  .page-btn:hover, .page-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+  
+  /* Chart containers */
+  .chart-wrap { position: relative; height: 260px; }
+  .chart-wrap-lg { position: relative; height: 320px; }
+
+  /* Rec list */
+  .rec-list { list-style: none; }
+  .rec-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 13px; line-height: 1.5; }
+  .rec-item:last-child { border-bottom: none; }
+  .rec-num { background: var(--accent); color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📊 Meta Ads Weekly Review</h1>
+  <div class="subtitle">Week of April 16–22, 2026 &nbsp;|&nbsp; Primary KPI: Leads (form) &nbsp;|&nbsp; Attribution: 7-day click / 1-day view &nbsp;|&nbsp; Local Lead Gen</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('overview')">Overview</div>
+  <div class="tab" onclick="showTab('campaigns')">Campaigns</div>
+  <div class="tab" onclick="showTab('ads')">Ad Table</div>
+  <div class="tab" onclick="showTab('recommendations')">Recommendations</div>
+  <div class="tab" onclick="showTab('validation')">Validation Flags</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- OVERVIEW TAB -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="content active" id="tab-overview">
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="label">Total Spend (AUD)</div>
+      <div class="value blue-text">$47,960</div>
+      <div class="sub">20 active campaigns</div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="label">Total Leads (form)</div>
+      <div class="value yellow-text">399</div>
+      <div class="sub">3 lead campaigns · $1,931 spend</div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="label">Avg. Cost per Lead</div>
+      <div class="value yellow-text">$4.84</div>
+      <div class="sub">🟡 Yellow zone (target: $2–$4)</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="label">[GTM] Job Ad Conv</div>
+      <div class="value blue-text">926</div>
+      <div class="sub">@ $2.52 · diff. attribution ⚠️</div>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <div class="alert alert-red">
+    <span class="alert-icon">🚨</span>
+    <div><strong>Urgent:</strong> Seg 4 - Quiz No Cap Shorter Form is generating Leads at <strong>$17.53 CPL</strong> — 3.5× your red threshold of $5.00. Pause immediately and redirect budget to Seg 6 (55+).</div>
+  </div>
+  <div class="alert alert-green">
+    <span class="alert-icon">✅</span>
+    <div><strong>Best performer:</strong> Seg 6 - Quiz (55+) running at <strong>$2.90 CPL</strong> — closest to your green benchmark. Scale 20–30% this week.</div>
+  </div>
+  <div class="alert alert-yellow">
+    <span class="alert-icon">⚠️</span>
+    <div><strong>Attribution mismatch:</strong> Seg 8 - Job Portal (Conversions) uses 1-day engaged-view attribution — broader than your configured window. 926 conversions may be inflated vs Lead campaigns.</div>
+  </div>
+  <div class="alert alert-blue">
+    <span class="alert-icon">ℹ️</span>
+    <div><strong>Spend concentration:</strong> 43% of account spend ($20,757) is on Post Engagement campaigns. 40% ($19,379) on Awareness/Reach. Only 4% ($1,931) directly tracks your Lead KPI.</div>
+  </div>
+
+  <!-- Two charts -->
+  <div class="two-col">
+    <div class="section">
+      <h3>📊 Lead Campaign Performance vs Benchmarks</h3>
+      <div class="chart-wrap">
+        <canvas id="cplChart"></canvas>
+      </div>
+    </div>
+    <div class="section">
+      <h3>💰 Spend by Campaign Type</h3>
+      <div class="chart-wrap">
+        <canvas id="spendDonut"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spend by campaign -->
+  <div class="section">
+    <h3>📋 Spend by Campaign (All)</h3>
+    <div class="chart-wrap-lg">
+      <canvas id="spendBar"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- CAMPAIGNS TAB -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="content" id="tab-campaigns">
+  <div class="filter-bar" id="camp-filters">
+    <div class="filter-btn active" onclick="filterCamps('all',this)">All</div>
+    <div class="filter-btn" onclick="filterCamps('lead',this)">Leads (form)</div>
+    <div class="filter-btn" onclick="filterCamps('conv',this)">Conversions</div>
+    <div class="filter-btn" onclick="filterCamps('traffic',this)">Traffic</div>
+    <div class="filter-btn" onclick="filterCamps('engagement',this)">Post Engagements</div>
+    <div class="filter-btn" onclick="filterCamps('reach',this)">Reach/Awareness</div>
+  </div>
+
+  <div class="section">
+    <table id="campTable">
+      <thead>
+        <tr>
+          <th>Campaign</th>
+          <th>KPI Type</th>
+          <th>Results</th>
+          <th>Spend (AUD)</th>
+          <th>Cost / Result</th>
+          <th>Impressions</th>
+          <th>CPM</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="campBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- ADS TAB -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="content" id="tab-ads">
+  <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+    <input class="search-input" id="adSearch" oninput="renderAds()" placeholder="Search ads...">
+    <div class="filter-bar" id="ad-camp-filters" style="margin:0">
+      <div class="filter-btn active" onclick="filterAds('all',this)">All Campaigns</div>
+      <div class="filter-btn" onclick="filterAds('lead',this)">Lead Gen</div>
+      <div class="filter-btn" onclick="filterAds('job',this)">Job Portal</div>
+      <div class="filter-btn" onclick="filterAds('regional',this)">Regional</div>
+    </div>
+  </div>
+
+  <div class="section" style="padding:0;overflow:hidden;">
+    <table id="adTable">
+      <thead>
+        <tr>
+          <th>Ad Name</th>
+          <th>Campaign</th>
+          <th>Spend</th>
+          <th style="min-width:120px">Spend Bar</th>
+          <th>Results</th>
+          <th>Cost/Result</th>
+          <th>CTR</th>
+          <th>Quality</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="adBody"></tbody>
+    </table>
+    <div class="pagination" style="padding:12px 16px;" id="adPagination"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- RECOMMENDATIONS TAB -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="content" id="tab-recommendations">
+  <div class="two-col">
+    <div>
+      <div class="section">
+        <h3>🎯 Recommendations (Prioritised)</h3>
+        <ul class="rec-list" id="recList"></ul>
+      </div>
+    </div>
+    <div>
+      <div class="section">
+        <h3>📅 Next Steps This Week</h3>
+        <ul class="rec-list" id="nextList"></ul>
+      </div>
+      <div class="section" style="margin-top:0">
+        <h3>📐 Derived CPM Benchmarks</h3>
+        <table>
+          <thead><tr><th>Campaign Type</th><th>Green</th><th>Yellow</th><th>Red</th></tr></thead>
+          <tbody>
+            <tr><td>Lead Gen (Instant Forms)</td><td class="green-text">&lt;$20</td><td class="yellow-text">$20–$35</td><td class="red-text">&gt;$35</td></tr>
+            <tr><td>Awareness / Reach</td><td class="green-text">&lt;$4</td><td class="yellow-text">$4–$7</td><td class="red-text">&gt;$7</td></tr>
+            <tr><td>Post Engagements</td><td class="green-text">&lt;$10</td><td class="yellow-text">$10–$15</td><td class="red-text">&gt;$15</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- VALIDATION FLAGS TAB -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="content" id="tab-validation">
+  <div class="section">
+    <h3>🔍 Validation Check Results — Apr 16–22, 2026</h3>
+    <table>
+      <thead><tr><th>#</th><th>Check</th><th>Result</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Export level (Ad Name column)</td><td><span class="badge badge-green">✅ Pass</span></td><td>Ad-level export confirmed</td></tr>
+        <tr><td>2</td><td>Weekly time breakdown</td><td><span class="badge badge-yellow">⚠️ Flag</span></td><td>Single week aggregate — no WoW trend. Re-export with Breakdown → By Time → Week next cycle.</td></tr>
+        <tr><td>3</td><td>Primary KPI column (Leads)</td><td><span class="badge badge-yellow">⚠️ Flag</span></td><td>Most campaigns use different result types. Only 3 campaigns track "Leads (form)." Analysis focuses on those.</td></tr>
+        <tr><td>4</td><td>KPI columns all zero</td><td><span class="badge badge-green">✅ Pass</span></td><td>Lead campaigns have real results</td></tr>
+        <tr><td>5</td><td>Duplicate rows</td><td><span class="badge badge-yellow">⚠️ Flag</span></td><td>File contains hierarchical + flat format. Campaign-level rows used only to prevent double-counting.</td></tr>
+        <tr><td>6</td><td>Partial week</td><td><span class="badge badge-green">✅ Pass</span></td><td>Full week Apr 16–22 confirmed</td></tr>
+        <tr><td>7</td><td>Date range mismatch between files</td><td><span class="badge badge-green">✅ Pass</span></td><td>Single file — no mismatch</td></tr>
+        <tr><td>8</td><td>Breakdown without main file</td><td><span class="badge badge-grey">N/A</span></td><td>No breakdown file uploaded</td></tr>
+        <tr><td>9</td><td>All learning phase</td><td><span class="badge badge-green">✅ Pass</span></td><td>Mixed delivery statuses — not all learning</td></tr>
+        <tr><td>—</td><td>File name vs data range</td><td><span class="badge badge-yellow">⚠️ Note</span></td><td>File named Apr 14–20 but data covers Apr 16–22. Confirmed via Reporting starts/ends columns.</td></tr>
+        <tr><td>—</td><td>Attribution window — Seg 8 Conv</td><td><span class="badge badge-yellow">⚠️ Flag</span></td><td>Seg 8 Conversions uses "7-day click, 1-day view, OR 1-day engaged-view" — broader than your configured standard.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script>
+// ── DATA ─────────────────────────────────────────────────────
+const CAMPAIGNS = [
+  { name:"Seg 3 - Quiz (Instant Forms) [35-54]", type:"lead",       results:239,    unit:"Leads (form)",       cpl:4.79,  spend:1145.19, impr:50815,  cpm:22.54 },
+  { name:"Seg 6 - Quiz (Instant Forms) [55+]",   type:"lead",       results:138,    unit:"Leads (form)",       cpl:2.90,  spend:400.33,  impr:16040,  cpm:24.96 },
+  { name:"Seg 4 - Quiz No Cap Shorter Form",      type:"lead",       results:22,     unit:"Leads (form)",       cpl:17.53, spend:385.56,  impr:7314,   cpm:52.72 },
+  { name:"Seg 8 - Job Portal (Conversions)",      type:"conv",       results:926,    unit:"[GTM] Job Ad Conv",  cpl:2.52,  spend:2330.51, impr:162634, cpm:14.33 },
+  { name:"Seg 8 - Job Portal (Traffic)",          type:"traffic",    results:3984,   unit:"Landing Page Views", cpl:0.57,  spend:2266.76, impr:300192, cpm:7.55  },
+  { name:"Seg 3 NSW Apr Regional",                type:"engagement", results:3114,   unit:"Post Engagements",   cpl:1.13,  spend:3507.21, impr:293002, cpm:11.97 },
+  { name:"Seg 3 QLD Apr Regional",                type:"engagement", results:2614,   unit:"Post Engagements",   cpl:1.35,  spend:3525.47, impr:226678, cpm:15.55 },
+  { name:"Seg 3 VIC Apr Regional",                type:"engagement", results:2705,   unit:"Post Engagements",   cpl:1.23,  spend:3329.38, impr:243364, cpm:13.68 },
+  { name:"Seg 4 NSW Apr Regional",                type:"engagement", results:2144,   unit:"Post Engagements",   cpl:1.65,  spend:3545.30, impr:295578, cpm:11.99 },
+  { name:"Seg 4 QLD Apr Regional",                type:"engagement", results:2254,   unit:"Post Engagements",   cpl:1.57,  spend:3532.94, impr:314709, cpm:11.23 },
+  { name:"Seg 4 VIC Regional Relaunch",           type:"engagement", results:1878,   unit:"Post Engagements",   cpl:1.77,  spend:3317.30, impr:251374, cpm:13.20 },
+  { name:"Seg 4 Mar Creative Refresh (Awareness)",type:"reach",      results:917669, unit:"Reach",              cpl:6.30,  spend:5781.71, impr:959334, cpm:6.03  },
+  { name:"Seg 6 Mar Creative Refresh (Awareness)",type:"reach",      results:882193, unit:"Reach",              cpl:3.96,  spend:3496.35, impr:898736, cpm:3.89  },
+  { name:"Seg 3 Mar Creative Refresh Apr",        type:"reach",      results:854744, unit:"Reach",              cpl:3.43,  spend:2931.64, impr:879135, cpm:3.33  },
+  { name:"Seg 3 Ethnic Hindi",                    type:"reach",      results:192943, unit:"Reach",              cpl:9.26,  spend:1786.39, impr:216845, cpm:8.24  },
+  { name:"Seg 3 Ethnic Chinese",                  type:"reach",      results:209866, unit:"Reach",              cpl:8.51,  spend:1785.59, impr:232354, cpm:7.68  },
+  { name:"Seg 3 Ethnic Arabic",                   type:"reach",      results:208739, unit:"Reach",              cpl:8.52,  spend:1779.21, impr:241087, cpm:7.38  },
+  { name:"Seg 3 Tax Awareness",                   type:"reach",      results:471241, unit:"Reach",              cpl:3.01,  spend:1419.30, impr:471784, cpm:3.01  },
+  { name:"Seg 4 Tax Awareness",                   type:"reach",      results:393469, unit:"Reach",              cpl:3.59,  spend:1414.15, impr:394251, cpm:3.59  },
+  { name:"Seg 2 Mar Batch Awareness (18-34)",     type:"reach",      results:173938, unit:"Reach",              cpl:4.03,  spend:700.53,  impr:264156, cpm:2.65  },
+];
+
+const ADS = [
+  // Lead campaigns
+  { name:"Seg 3 - Quiz 24 Mar 2026 – Copy",       camp:"Seg 3 Quiz [35-54]",  spend:1039.62, results:211, unit:"Leads",  cpl:4.93,  ctr:"n/a", quality:"Average",  type:"lead",    status:"active" },
+  { name:"Seg 3 - Quiz 19 Mar 2026",              camp:"Seg 3 Quiz [35-54]",  spend:105.59,  results:28,  unit:"Leads",  cpl:3.77,  ctr:"n/a", quality:"Average",  type:"lead",    status:"active" },
+  { name:"Seg 6 - Quiz Instant Forms",            camp:"Seg 6 Quiz [55+]",    spend:400.33,  results:138, unit:"Leads",  cpl:2.90,  ctr:"n/a", quality:"Average",  type:"lead",    status:"active" },
+  { name:"Seg 4 - Quiz No Cap Shorter Form",      camp:"Seg 4 Quiz No Cap",   spend:385.56,  results:22,  unit:"Leads",  cpl:17.53, ctr:"n/a", quality:"Below Avg",type:"lead",    status:"active" },
+  // Job portal convs
+  { name:"Ad 06 - Copy",  camp:"Job Portal Conv", spend:982.94,  results:372, unit:"Conv", cpl:2.64, ctr:"5.37%", quality:"Average", type:"job", status:"active" },
+  { name:"Ad 02 - Copy",  camp:"Job Portal Conv", spend:724.45,  results:306, unit:"Conv", cpl:2.37, ctr:"5.32%", quality:"Average", type:"job", status:"active" },
+  { name:"Ad 03",         camp:"Job Portal Conv", spend:336.60,  results:138, unit:"Conv", cpl:2.44, ctr:"3.33%", quality:"Average", type:"job", status:"active" },
+  { name:"Ad 01 - Copy",  camp:"Job Portal Conv", spend:121.74,  results:61,  unit:"Conv", cpl:2.00, ctr:"4.60%", quality:"Average", type:"job", status:"active" },
+  { name:"Ad 04",         camp:"Job Portal Conv", spend:38.22,   results:9,   unit:"Conv", cpl:4.25, ctr:"4.38%", quality:"Average", type:"job", status:"active" },
+  { name:"Ad 06 (paused)",camp:"Job Portal Conv", spend:89.49,   results:28,  unit:"Conv", cpl:3.20, ctr:"3.80%", quality:"Average", type:"job", status:"inactive" },
+  // Traffic
+  { name:"Ad 06",  camp:"Job Portal Traffic", spend:1074.73, results:1756, unit:"LPV", cpl:0.61, ctr:"1.91%", quality:"Average",    type:"job", status:"active" },
+  { name:"Ad 07",  camp:"Job Portal Traffic", spend:633.98,  results:1146, unit:"LPV", cpl:0.55, ctr:"3.02%", quality:"Average",    type:"job", status:"active" },
+  { name:"Ad 04",  camp:"Job Portal Traffic", spend:315.99,  results:531,  unit:"LPV", cpl:0.60, ctr:"2.53%", quality:"Average",    type:"job", status:"active" },
+  { name:"Ad 05",  camp:"Job Portal Traffic", spend:86.48,   results:240,  unit:"LPV", cpl:0.36, ctr:"1.52%", quality:"—",          type:"job", status:"active" },
+  { name:"Ad 03",  camp:"Job Portal Traffic", spend:123.91,  results:257,  unit:"LPV", cpl:0.48, ctr:"2.65%", quality:"Average",    type:"job", status:"active" },
+  // Regional top ads
+  { name:"Macarthur 01 – Copy",  camp:"Seg 3 NSW Regional",spend:654.90, results:611, unit:"Eng", cpl:1.07, ctr:"3.21%", quality:"Below Avg", type:"regional",status:"active" },
+  { name:"McMahon 01 – Copy",    camp:"Seg 3 NSW Regional",spend:634.54, results:559, unit:"Eng", cpl:1.14, ctr:"2.29%", quality:"Average",   type:"regional",status:"active" },
+  { name:"Chifley 01 – Copy",    camp:"Seg 3 NSW Regional",spend:525.54, results:425, unit:"Eng", cpl:1.24, ctr:"2.50%", quality:"Below Avg", type:"regional",status:"active" },
+  { name:"Moncreiff 02",         camp:"Seg 4 QLD Regional",spend:1018.24,results:658, unit:"Eng", cpl:1.55, ctr:"0.68%", quality:"Below Avg", type:"regional",status:"active" },
+  { name:"La Trobe 01",          camp:"Seg 3 VIC Regional",spend:778.47, results:625, unit:"Eng", cpl:1.25, ctr:"2.02%", quality:"—",         type:"regional",status:"active" },
+  { name:"McEwen 01",            camp:"Seg 3 VIC Regional",spend:579.93, results:505, unit:"Eng", cpl:1.15, ctr:"2.69%", quality:"Average",   type:"regional",status:"active" },
+  { name:"Corio 01",             camp:"Seg 3 VIC Regional",spend:410.55, results:306, unit:"Eng", cpl:1.34, ctr:"4.08%", quality:"Below Avg", type:"regional",status:"active" },
+  { name:"Forde 02 – Copy",      camp:"Seg 3 QLD Regional",spend:713.90, results:521, unit:"Eng", cpl:1.37, ctr:"2.23%", quality:"Below Avg", type:"regional",status:"active" },
+];
+
+const RECOMMENDATIONS = [
+  { text: "URGENT — Pause Seg 4 - Quiz No Cap Shorter Form ($17.53 CPL). Redirect its ~$55/day to Seg 6 - Quiz (55+).", urgency: "red" },
+  { text: "Scale Seg 6 - Quiz (55+) by 20–30% budget. At $2.90 CPL this is your only near-green Lead campaign.", urgency: "green" },
+  { text: "Test a fresh creative in Seg 3 - Quiz [35-54]. The 19 Mar ad at $3.77 CPL outperforms the 24 Mar ad at $4.93 CPL — the latter may be fatiguing.", urgency: "yellow" },
+  { text: "Investigate Seg 8 Job Portal Conversions attribution. The 1-day engaged-view inclusion may inflate the 926 conversion count vs your standard window.", urgency: "yellow" },
+  { text: "Audit regional content campaigns' connection to Lead Gen funnel. $20,757 (43% of spend) on Post Engagements — confirm these feed retargeting or Lead pipelines.", urgency: "yellow" },
+  { text: "Review Ethnic language campaign ROI. $5,351 on Reach-only objectives with no visible Lead attribution path.", urgency: "yellow" },
+  { text: "Pause or restructure Seg 4 Tax Awareness. 0.07% CTR and $21.43 cost per LPV indicate the Instagram-only placement / creative is not driving engagement.", urgency: "yellow" },
+];
+
+const NEXT_STEPS = [
+  { text: "Today: Pause Seg 4 - Quiz No Cap Shorter Form." },
+  { text: "Today: Increase Seg 6 - Quiz daily budget by $50–70 AUD." },
+  { text: "By Wednesday: Upload a new creative for Seg 3 - Quiz [35-54]." },
+  { text: "By Wednesday: Confirm Seg 8 Job Portal Conversions attribution setting." },
+  { text: "By Thursday: Review CRM pipeline to confirm regional/ethnic campaigns contribute to Lead funnel." },
+  { text: "Next export: Enable Breakdown → By Time → Week for WoW trends. Also export Placement breakdown." },
+];
+
+const MAX_SPEND = Math.max(...CAMPAIGNS.map(c => c.spend));
+
+// ── Tab switching ─────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── Status badge ─────────────────────────────────────────────
+function statusBadge(cpl, type) {
+  if (type === "lead") {
+    if (cpl <= 4)  return '<span class="badge badge-green">🟢 Green</span>';
+    if (cpl <= 5)  return '<span class="badge badge-yellow">🟡 Yellow</span>';
+    return '<span class="badge badge-red">🔴 Red</span>';
+  }
+  return '<span class="badge badge-blue">ℹ️ '+type+'</span>';
+}
+function cplColor(cpl, type) {
+  if (type !== "lead") return '';
+  if (cpl <= 4)  return 'style="color:var(--green);font-weight:600"';
+  if (cpl <= 5)  return 'style="color:var(--yellow);font-weight:600"';
+  return 'style="color:var(--red);font-weight:600"';
+}
+function typeBadge(type) {
+  const map = { lead:"badge-green", conv:"badge-blue", traffic:"badge-blue", engagement:"badge-grey", reach:"badge-grey" };
+  const label = { lead:"Leads", conv:"Conv", traffic:"Traffic", engagement:"Post Eng", reach:"Reach" };
+  return `<span class="badge ${map[type]||'badge-grey'}">${label[type]||type}</span>`;
+}
+
+// ── Campaign table ─────────────────────────────────────────────
+let campFilter = 'all';
+function filterCamps(f, el) {
+  campFilter = f;
+  document.querySelectorAll('#camp-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderCamps();
+}
+function renderCamps() {
+  const data = campFilter === 'all' ? CAMPAIGNS : CAMPAIGNS.filter(c => c.type === campFilter);
+  const tbody = document.getElementById('campBody');
+  tbody.innerHTML = data.map(c => `
+    <tr>
+      <td>${c.name}</td>
+      <td>${typeBadge(c.type)}</td>
+      <td>${c.results.toLocaleString()}</td>
+      <td>$${c.spend.toLocaleString('en-AU',{minimumFractionDigits:2})}</td>
+      <td ${cplColor(c.cpl, c.type)}>$${c.cpl.toFixed(2)}</td>
+      <td>${c.impr.toLocaleString()}</td>
+      <td>$${c.cpm.toFixed(2)}</td>
+      <td>${statusBadge(c.cpl, c.type)}</td>
+    </tr>`).join('');
+}
+
+// ── Ad table ─────────────────────────────────────────────────
+let adFilter = 'all';
+let adPage = 0;
+const ADS_PER_PAGE = 15;
+
+function filterAds(f, el) {
+  adFilter = f;
+  adPage = 0;
+  document.querySelectorAll('#ad-camp-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderAds();
+}
+function renderAds() {
+  const q = document.getElementById('adSearch').value.toLowerCase();
+  let data = ADS.filter(a => {
+    if (adFilter === 'lead' && a.type !== 'lead') return false;
+    if (adFilter === 'job' && a.type !== 'job') return false;
+    if (adFilter === 'regional' && a.type !== 'regional') return false;
+    if (q && !a.name.toLowerCase().includes(q) && !a.camp.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const maxSp = Math.max(...data.map(a => a.spend));
+  const pages = Math.ceil(data.length / ADS_PER_PAGE);
+  if (adPage >= pages) adPage = 0;
+  const pageData = data.slice(adPage * ADS_PER_PAGE, (adPage+1) * ADS_PER_PAGE);
+
+  const qualBadge = q => {
+    if (!q || q === '—') return '<span class="badge badge-grey">—</span>';
+    if (q.includes('Above')) return '<span class="badge badge-green">Above Avg</span>';
+    if (q.includes('Average') && !q.includes('Below')) return '<span class="badge badge-blue">Average</span>';
+    return '<span class="badge badge-red">Below Avg</span>';
+  };
+
+  document.getElementById('adBody').innerHTML = pageData.map(a => {
+    const pct = maxSp > 0 ? (a.spend/maxSp*100).toFixed(0) : 0;
+    return `<tr>
+      <td>${a.name}${a.status==='inactive'?' <span class="badge badge-grey">paused</span>':''}</td>
+      <td><span style="color:var(--muted);font-size:11px">${a.camp}</span></td>
+      <td>$${a.spend.toLocaleString('en-AU',{minimumFractionDigits:2})}</td>
+      <td><div class="spend-bar-wrap"><div class="spend-bar" style="width:${pct}%"></div></div></td>
+      <td>${a.results}</td>
+      <td ${cplColor(a.cpl, a.type)}>$${a.cpl.toFixed(2)}</td>
+      <td>${a.ctr}</td>
+      <td>${qualBadge(a.quality)}</td>
+      <td>${statusBadge(a.cpl, a.type)}</td>
+    </tr>`;
+  }).join('');
+
+  // Pagination
+  const pag = document.getElementById('adPagination');
+  if (pages <= 1) { pag.innerHTML = ''; return; }
+  let html = `<span style="color:var(--muted);font-size:12px">Page ${adPage+1} of ${pages}</span>`;
+  html += `<button class="page-btn" onclick="goAdPage(${adPage-1})" ${adPage===0?'disabled':''}>←</button>`;
+  for (let i=0; i<pages; i++) html += `<button class="page-btn${i===adPage?' active':''}" onclick="goAdPage(${i})">${i+1}</button>`;
+  html += `<button class="page-btn" onclick="goAdPage(${adPage+1})" ${adPage===pages-1?'disabled':''}>→</button>`;
+  pag.innerHTML = html;
+}
+function goAdPage(p) { adPage = p; renderAds(); }
+
+// ── Recs ─────────────────────────────────────────────────────
+function renderRecs() {
+  const colors = { red:'red-text', green:'green-text', yellow:'yellow-text' };
+  document.getElementById('recList').innerHTML = RECOMMENDATIONS.map((r,i) =>
+    `<li class="rec-item"><div class="rec-num">${i+1}</div><div class="${colors[r.urgency]||''}">${r.text}</div></li>`
+  ).join('');
+  document.getElementById('nextList').innerHTML = NEXT_STEPS.map((r,i) =>
+    `<li class="rec-item"><div class="rec-num">${i+1}</div><div>${r.text}</div></li>`
+  ).join('');
+}
+
+// ── Charts ───────────────────────────────────────────────────
+function initCharts() {
+  const CHART_DEFAULTS = { responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'Segoe UI', size: 12 } } } },
+    scales: {} };
+
+  // CPL chart — lead campaigns only
+  new Chart(document.getElementById('cplChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Seg 3 Quiz [35-54]', 'Seg 6 Quiz [55+]', 'Seg 4 Quiz No Cap'],
+      datasets: [
+        { label: 'Cost per Lead ($)',
+          data: [4.79, 2.90, 17.53],
+          backgroundColor: ['#ef444466','#22c55e66','#ef444466'],
+          borderColor:     ['#ef4444',  '#22c55e',  '#ef4444'],
+          borderWidth: 2, borderRadius: 6 },
+        { label: 'Green threshold ($4)',
+          data: [4,4,4], type:'line', borderColor:'#22c55e', borderDash:[4,4], pointRadius:0, borderWidth:2 },
+        { label: 'Red threshold ($5)',
+          data: [5,5,5], type:'line', borderColor:'#ef4444', borderDash:[4,4], pointRadius:0, borderWidth:2 },
+      ]
+    },
+    options: { ...CHART_DEFAULTS,
+      plugins: { ...CHART_DEFAULTS.plugins, tooltip: { callbacks: { label: ctx => ` $${ctx.raw.toFixed(2)} AUD` } } },
+      scales: { y: { ticks: { color:'#94a3b8', callback:v=>'$'+v }, grid: { color:'#2e325040' } },
+                x: { ticks: { color:'#94a3b8' }, grid: { color:'#2e325040' } } }
+    }
+  });
+
+  // Spend donut
+  new Chart(document.getElementById('spendDonut'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Post Engagements', 'Awareness/Reach', 'Job Portal', 'Lead Gen (Forms)'],
+      datasets: [{ data: [20756.60, 19379.19, 4597.27, 1931.08],
+        backgroundColor: ['#6366f1','#3b82f6','#22c55e','#f59e0b'],
+        borderColor: '#0f1117', borderWidth: 3 }]
+    },
+    options: { ...CHART_DEFAULTS, cutout: '62%',
+      plugins: { ...CHART_DEFAULTS.plugins,
+        tooltip: { callbacks: { label: ctx => ` $${ctx.raw.toLocaleString('en-AU',{minimumFractionDigits:2})} AUD (${(ctx.raw/47664.14*100).toFixed(1)}%)` } } }
+    }
+  });
+
+  // Spend bar all campaigns
+  const sorted = [...CAMPAIGNS].sort((a,b) => b.spend-a.spend);
+  const colors = sorted.map(c => ({lead:'#f59e0b',conv:'#22c55e',traffic:'#3b82f6',engagement:'#6366f1',reach:'#8b5cf6'})[c.type]||'#94a3b8');
+  new Chart(document.getElementById('spendBar'), {
+    type: 'bar',
+    data: {
+      labels: sorted.map(c => c.name.length > 28 ? c.name.slice(0,28)+'…' : c.name),
+      datasets: [{ label: 'Spend (AUD)',
+        data: sorted.map(c => c.spend),
+        backgroundColor: colors.map(c => c+'aa'),
+        borderColor: colors, borderWidth: 2, borderRadius: 4 }]
+    },
+    options: { ...CHART_DEFAULTS, indexAxis: 'y',
+      plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` $${ctx.raw.toLocaleString('en-AU',{minimumFractionDigits:2})}` } } },
+      scales: {
+        x: { ticks: { color:'#94a3b8', callback: v => '$'+v.toLocaleString() }, grid: { color:'#2e325040' } },
+        y: { ticks: { color:'#94a3b8', font: { size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// ── Init ─────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  renderCamps();
+  renderAds();
+  renderRecs();
+  initCharts();
+});
+</script>
+</body>
+</html>
